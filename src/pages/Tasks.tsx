@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import TaskCard from '@/components/TaskCard';
-import { tasks, clients, TaskStatus, getPriorityColor, getStatusColor } from '@/lib/data';
+import { tasks as initialTasks, clients, TaskStatus, getPriorityColor, getStatusColor } from '@/lib/data';
 import { Filter, Plus, Search, ChevronDown } from 'lucide-react';
 
 export default function Tasks() {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<TaskStatus | null>(null);
+  const [tasks, setTasks] = useState(initialTasks);
   
   // Filter tasks based on selected filters
   const filteredTasks = tasks.filter(task => {
@@ -31,6 +33,42 @@ export default function Tasks() {
     doing: filteredTasks.filter(task => task.status === 'doing'),
     review: filteredTasks.filter(task => task.status === 'review'),
     done: filteredTasks.filter(task => task.status === 'done')
+  };
+  
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+    
+    // If there's no destination or the item was dropped in the same place, do nothing
+    if (!destination || 
+        (destination.droppableId === source.droppableId && 
+         destination.index === source.index)) {
+      return;
+    }
+    
+    // Get the task ID and convert to number
+    const taskId = parseInt(draggableId);
+    
+    // Find the task
+    const taskToUpdate = tasks.find(task => task.id === taskId);
+    if (!taskToUpdate) return;
+    
+    // Update task status based on destination column
+    const newStatus = destination.droppableId as TaskStatus;
+    
+    // Create a new tasks array with the updated task
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          status: newStatus
+        };
+      }
+      return task;
+    });
+    
+    // Update state
+    setTasks(updatedTasks);
+    console.log(`Task ${taskId} moved from ${source.droppableId} to ${destination.droppableId}`);
   };
   
   return (
@@ -146,111 +184,189 @@ export default function Tasks() {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
-        <div className="glass-dark rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-muted" />
-              <h3 className="font-medium">A Fazer</h3>
-              <span className="text-sm text-muted-foreground">({tasksByStatus.todo.length})</span>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
+          <div className="glass-dark rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-muted" />
+                <h3 className="font-medium">A Fazer</h3>
+                <span className="text-sm text-muted-foreground">({tasksByStatus.todo.length})</span>
+              </div>
+              
+              <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
             
-            <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
-              <Plus className="w-4 h-4" />
-            </button>
+            <Droppable droppableId="todo">
+              {(provided) => (
+                <div 
+                  className="space-y-3 min-h-[50px]"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {tasksByStatus.todo.map((task, index) => (
+                    <Draggable key={task.id} draggableId={`${task.id}`} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <TaskCard {...task} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  
+                  {tasksByStatus.todo.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p className="text-sm">Nenhuma tarefa neste status</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Droppable>
           </div>
           
-          <div className="space-y-3">
-            {tasksByStatus.todo.map(task => (
-              <TaskCard key={task.id} {...task} />
-            ))}
-            
-            {tasksByStatus.todo.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="text-sm">Nenhuma tarefa neste status</p>
+          <div className="glass-dark rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <h3 className="font-medium">Em Andamento</h3>
+                <span className="text-sm text-muted-foreground">({tasksByStatus.doing.length})</span>
               </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="glass-dark rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500" />
-              <h3 className="font-medium">Em Andamento</h3>
-              <span className="text-sm text-muted-foreground">({tasksByStatus.doing.length})</span>
+              
+              <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
             
-            <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
-              <Plus className="w-4 h-4" />
-            </button>
+            <Droppable droppableId="doing">
+              {(provided) => (
+                <div 
+                  className="space-y-3 min-h-[50px]"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {tasksByStatus.doing.map((task, index) => (
+                    <Draggable key={task.id} draggableId={`${task.id}`} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <TaskCard {...task} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  
+                  {tasksByStatus.doing.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p className="text-sm">Nenhuma tarefa neste status</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Droppable>
           </div>
           
-          <div className="space-y-3">
-            {tasksByStatus.doing.map(task => (
-              <TaskCard key={task.id} {...task} />
-            ))}
-            
-            {tasksByStatus.doing.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="text-sm">Nenhuma tarefa neste status</p>
+          <div className="glass-dark rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <h3 className="font-medium">Em Revisão</h3>
+                <span className="text-sm text-muted-foreground">({tasksByStatus.review.length})</span>
               </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="glass-dark rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <h3 className="font-medium">Em Revisão</h3>
-              <span className="text-sm text-muted-foreground">({tasksByStatus.review.length})</span>
+              
+              <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
             
-            <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
-              <Plus className="w-4 h-4" />
-            </button>
+            <Droppable droppableId="review">
+              {(provided) => (
+                <div 
+                  className="space-y-3 min-h-[50px]"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {tasksByStatus.review.map((task, index) => (
+                    <Draggable key={task.id} draggableId={`${task.id}`} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <TaskCard {...task} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  
+                  {tasksByStatus.review.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p className="text-sm">Nenhuma tarefa neste status</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Droppable>
           </div>
           
-          <div className="space-y-3">
-            {tasksByStatus.review.map(task => (
-              <TaskCard key={task.id} {...task} />
-            ))}
-            
-            {tasksByStatus.review.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="text-sm">Nenhuma tarefa neste status</p>
+          <div className="glass-dark rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+                <h3 className="font-medium">Concluído</h3>
+                <span className="text-sm text-muted-foreground">({tasksByStatus.done.length})</span>
               </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="glass-dark rounded-xl p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <h3 className="font-medium">Concluído</h3>
-              <span className="text-sm text-muted-foreground">({tasksByStatus.done.length})</span>
+              
+              <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
+                <Plus className="w-4 h-4" />
+              </button>
             </div>
             
-            <button className="p-1 rounded-lg hover:bg-muted/20 transition-colors">
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-          
-          <div className="space-y-3">
-            {tasksByStatus.done.map(task => (
-              <TaskCard key={task.id} {...task} />
-            ))}
-            
-            {tasksByStatus.done.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="text-sm">Nenhuma tarefa neste status</p>
-              </div>
-            )}
+            <Droppable droppableId="done">
+              {(provided) => (
+                <div 
+                  className="space-y-3 min-h-[50px]"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {tasksByStatus.done.map((task, index) => (
+                    <Draggable key={task.id} draggableId={`${task.id}`} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <TaskCard {...task} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                  
+                  {tasksByStatus.done.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p className="text-sm">Nenhuma tarefa neste status</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Droppable>
           </div>
         </div>
-      </div>
+      </DragDropContext>
     </div>
   );
 }

@@ -242,6 +242,38 @@ export const weeklyPerformance = [
   { week: 'Semana 4', tasks: 18, completed: 15 }
 ];
 
+// Adding users array for chat functionality
+export const users = [
+  { 
+    id: 1, 
+    name: "Carlos Mendes", 
+    email: "carlos@example.com",
+    avatar: "https://ui.shadcn.com/avatars/04.png",
+    role: "Designer"
+  },
+  { 
+    id: 2, 
+    name: "João Silva", 
+    email: "joao@example.com",
+    avatar: "https://ui.shadcn.com/avatars/01.png",
+    role: "Developer"
+  },
+  { 
+    id: 3, 
+    name: "Ana Oliveira", 
+    email: "ana@example.com",
+    avatar: "https://ui.shadcn.com/avatars/03.png",
+    role: "Marketing"
+  },
+  { 
+    id: 4, 
+    name: "Mariana Costa", 
+    email: "mariana@example.com",
+    avatar: "https://ui.shadcn.com/avatars/02.png",
+    role: "Content Manager"
+  }
+];
+
 export const getClientById = (id: number) => {
   return clients.find(client => client.id === id);
 };

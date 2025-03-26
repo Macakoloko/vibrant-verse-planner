@@ -11,7 +11,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Zap,
-  Kanban
+  Kanban,
+  MessageSquare
 } from 'lucide-react';
 
 interface SidebarItemProps {
@@ -88,6 +89,7 @@ export default function Sidebar() {
         <SidebarItem icon={Kanban} label="Projetos" to="/projects" collapsed={collapsed} />
         <SidebarItem icon={Calendar} label="Calendário" to="/calendar" collapsed={collapsed} />
         <SidebarItem icon={Users} label="Clientes" to="/clients" collapsed={collapsed} />
+        <SidebarItem icon={MessageSquare} label="Chat" to="/chat" collapsed={collapsed} />
       </div>
       
       <div className="border-t border-border/40 pt-2 p-2 space-y-1">

@@ -10,6 +10,7 @@ import Tasks from "./pages/Tasks";
 import Projects from "./pages/Projects";
 import Calendar from "./pages/Calendar";
 import Clients from "./pages/Clients";
+import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import Sidebar from "./components/Sidebar";
 
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/projects" element={<Projects />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/clients" element={<Clients />} />
+              <Route path="/chat" element={<Chat />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
