@@ -6,7 +6,8 @@ import {
   Camera, 
   Video, 
   Megaphone, 
-  Tag 
+  Tag,
+  Link2
 } from 'lucide-react';
 
 // Client data
@@ -60,7 +61,7 @@ export type TaskStatus = 'todo' | 'doing' | 'review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 // Content types
-export type ContentType = 'post' | 'story' | 'reels' | 'ad' | 'video' | 'blog';
+export type ContentType = 'post' | 'story' | 'reels' | 'ad' | 'video' | 'blog' | 'link';
 
 // Tags
 export const tags = [
@@ -299,6 +300,8 @@ export const getContentTypeIcon = (type: ContentType) => {
       return Video;
     case 'ad':
       return Megaphone;
+    case 'link':
+      return Link2;
     default:
       return Tag;
   }

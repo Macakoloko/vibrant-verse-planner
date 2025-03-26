@@ -58,9 +58,19 @@ export default function Sidebar() {
       collapsed ? "w-[70px]" : "w-[240px]",
       "transition-all duration-300 ease-in-out"
     )}>
-      <div className="p-4 flex items-center mb-2">
-        {!collapsed && (
-          <h1 className="text-xl font-semibold text-foreground ml-2">Agência<span className="text-primary">HQ</span></h1>
+      <div className="p-4 flex items-center mb-2 justify-center">
+        {!collapsed ? (
+          <img 
+            src="/lovable-uploads/94174d70-177d-4594-803f-abf234f836ca.png" 
+            alt="Logo" 
+            className="h-8" 
+          />
+        ) : (
+          <img 
+            src="/lovable-uploads/94174d70-177d-4594-803f-abf234f836ca.png" 
+            alt="Logo" 
+            className="h-6" 
+          />
         )}
         
         <button 
