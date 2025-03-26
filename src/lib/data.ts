@@ -1,4 +1,3 @@
-
 import { 
   Users, 
   UserPlus, 
@@ -200,7 +199,7 @@ export const calendarEvents = [
     date: new Date(Date.now() + 86400000 * 1),
     time: '10:00',
     status: 'scheduled',
-    contentType: 'post',
+    contentType: 'post' as ContentType,
     image: '/placeholder.svg'
   },
   {
@@ -210,7 +209,7 @@ export const calendarEvents = [
     date: new Date(Date.now() + 86400000 * 1),
     time: '15:00',
     status: 'draft',
-    contentType: 'story',
+    contentType: 'story' as ContentType,
     image: '/placeholder.svg'
   },
   {
@@ -220,7 +219,7 @@ export const calendarEvents = [
     date: new Date(Date.now() + 86400000 * 2),
     time: '12:30',
     status: 'scheduled',
-    contentType: 'reels',
+    contentType: 'reels' as ContentType,
     image: '/placeholder.svg'
   },
   {
@@ -230,7 +229,7 @@ export const calendarEvents = [
     date: new Date(Date.now() + 86400000 * 3),
     time: '09:00',
     status: 'pending',
-    contentType: 'post',
+    contentType: 'post' as ContentType,
     image: '/placeholder.svg'
   },
 ];

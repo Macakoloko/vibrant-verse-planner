@@ -10,7 +10,8 @@ import {
   Settings, 
   ChevronLeft, 
   ChevronRight, 
-  Zap 
+  Zap,
+  Kanban
 } from 'lucide-react';
 
 interface SidebarItemProps {
@@ -84,6 +85,7 @@ export default function Sidebar() {
       <div className="space-y-1 px-2 flex-1">
         <SidebarItem icon={LayoutDashboard} label="Dashboard" to="/dashboard" collapsed={collapsed} />
         <SidebarItem icon={ListTodo} label="Tarefas" to="/tasks" collapsed={collapsed} />
+        <SidebarItem icon={Kanban} label="Projetos" to="/projects" collapsed={collapsed} />
         <SidebarItem icon={Calendar} label="Calendário" to="/calendar" collapsed={collapsed} />
         <SidebarItem icon={Users} label="Clientes" to="/clients" collapsed={collapsed} />
       </div>

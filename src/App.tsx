@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
+import Projects from "./pages/Projects";
 import Calendar from "./pages/Calendar";
 import Clients from "./pages/Clients";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/tasks" element={<Tasks />} />
+              <Route path="/projects" element={<Projects />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/clients" element={<Clients />} />
               <Route path="*" element={<NotFound />} />
