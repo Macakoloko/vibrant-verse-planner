@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { Plus, ChevronDown, Search, Clock, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { tasks, clients, TaskStatus, getClientById, getTagById, getPriorityColor } from '@/lib/data';
+import { tasks as initialTasks, clients, TaskStatus, getClientById, getTagById, getPriorityColor } from '@/lib/data';
 import { cn } from '@/lib/utils';
 
 interface KanbanColumn {
@@ -17,6 +16,7 @@ interface KanbanColumn {
 
 export default function Projects() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [tasks, setTasks] = useState(initialTasks);
   const [columns, setColumns] = useState<KanbanColumn[]>([
     { id: 'todo', title: 'A fazer', taskIds: tasks.filter(task => task.status === 'todo').map(task => task.id), color: '#6B7280' },
     { id: 'doing', title: 'Em andamento', taskIds: tasks.filter(task => task.status === 'doing').map(task => task.id), color: '#3B82F6' },
@@ -51,12 +51,14 @@ export default function Projects() {
     
     if (!sourceColumn || !destColumn) return;
     
-    // Create new array of columns
+    // Create new arrays for updated columns
     const newColumns = [...columns];
+    
+    // Get the task id that's being moved
+    const taskId = parseInt(draggableId);
     
     // Remove from source column
     const sourceColumnIndex = newColumns.findIndex(col => col.id === source.droppableId);
-    const taskId = parseInt(draggableId);
     newColumns[sourceColumnIndex] = {
       ...sourceColumn,
       taskIds: sourceColumn.taskIds.filter(id => id !== taskId)
@@ -71,9 +73,30 @@ export default function Projects() {
       taskIds: newTaskIds
     };
     
+    // Update task status in our tasks state
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        // Convert the destination column id to a TaskStatus if it's one of our standard statuses
+        let newStatus: TaskStatus = task.status;
+        if (destination.droppableId === 'todo' || 
+            destination.droppableId === 'doing' || 
+            destination.droppableId === 'review' || 
+            destination.droppableId === 'done') {
+          newStatus = destination.droppableId as TaskStatus;
+        }
+        
+        return {
+          ...task,
+          status: newStatus
+        };
+      }
+      return task;
+    });
+    
+    // Update our state
+    setTasks(updatedTasks);
     setColumns(newColumns);
     
-    // Update task status in real application, you would call an API
     console.log(`Task ${taskId} moved from ${source.droppableId} to ${destination.droppableId}`);
   };
   
